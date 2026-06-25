@@ -1,0 +1,73 @@
+services:
+  elasticsearch:
+    build:
+      context: ./infra/elasticsearch
+    container_name: nku-es
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  kibana:
+    # 核心修改：填入你刚刚查到的 Kibana 100% 正确的国内直连代拉地址
+    image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/docker.elastic.co/kibana/kibana:8.15.3
+    container_name: nku-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+
+  tika:
+    # 核心修改：使用页面里给出的国内华为云直连源
+    image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/apache/tika:3.1.0.0-full
+    container_name: nku-tika
+    ports:
+      - "9998:9998"
+
+  api:
+    build:
+      context: ./backend
+    container_name: nku-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HF_ENDPOINT: https://hf-mirror.com
+      HF_HOME: /data/hf-cache
+      TRANSFORMERS_CACHE: /data/hf-cache
+      SENTENCE_TRANSFORMERS_HOME: /data/hf-cache
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+      - ./image:/image:ro
+    depends_on:
+      - elasticsearch
+      - tika
+    ports:
+      - "8080:8000"
+
+  crawler:
+    build:
+      context: ./crawler
+    container_name: nku-crawler
+    profiles:
+      - crawler
+    env_file:
+      - .env
+    volumes:
+      - ./crawler:/crawler
+      - ./data:/data
+    depends_on:
+      - elasticsearch
+      - tika
+    command: ["python", "-m", "app.run"]
+
+volumes:
+  es-data:

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像填写 - Nankai University Search</title>
+    <link rel="icon" type="image/webp" href="{{ favicon_url | default('/favicon.ico', true) }}">
+    <link rel="stylesheet" href="/static/styles.css?v=20260616-profile-v8">
+</head>
+<body class="app-shell login-page">
+    <div class="ambient-layer" aria-hidden="true">
+        <div class="ambient-glow ambient-glow-a"></div>
+        <div class="ambient-glow ambient-glow-b"></div>
+    </div>
+
+    <header class="topbar">
+        <a href="/" class="brand bubble-target">
+            <span class="brand-mark">NKU</span>
+            <span class="brand-text">
+                <strong>Nankai University Search</strong>
+                <small>南开大学信息检索平台</small>
+            </span>
+        </a>
+        <div class="top-actions">
+            <a href="/" class="ghost-button bubble-target">暂不填写</a>
+        </div>
+    </header>
+
+    <main class="auth-shell">
+        <section class="auth-card profile-card">
+            <p class="eyebrow">Profile Setup</p>
+            <h1>填写检索画像</h1>
+            <p class="sublead">
+                这里的字段会进入个性化检索与推荐模块。系统会结合你的学院、专业、兴趣标签以及最近查询，辅助生成个性化结果。
+            </p>
+
+            <form id="profile-form" class="auth-form">
+                <label class="field">
+                    <span>身份</span>
+                    <select id="profile-identity">
+                        <option value="本科生">本科生</option>
+                        <option value="研究生">研究生</option>
+                        <option value="教师">教师</option>
+                        <option value="访客">访客</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>院系 / 站点</span>
+                    <select id="profile-college">
+                        <option value="">请选择</option>
+                        <option value="南开大学">南开大学</option>
+                        <option value="南开大学新闻网">南开大学新闻网</option>
+                        <option value="教务处">教务处</option>
+                        <option value="本科招生网">本科招生网</option>
+                        <option value="研究生招生网">研究生招生网</option>
+                        <option value="研究生院">研究生院</option>
+                        <option value="计算机学院">计算机学院</option>
+                        <option value="网络与空间安全学院">网络与空间安全学院</option>
+                        <option value="人工智能学院">人工智能学院</option>
+                        <option value="环境学院">环境学院</option>
+                        <option value="商学院">商学院</option>
+                        <option value="经济学院">经济学院</option>
+                        <option value="金融学院">金融学院</option>
+                        <option value="化学学院">化学学院</option>
+                        <option value="医学院">医学院</option>
+                        <option value="物理科学学院">物理科学学院</option>
+                        <option value="数学科学学院">数学科学学院</option>
+                        <option value="马克思主义学院">马克思主义学院</option>
+                        <option value="周恩来政府管理学院">周恩来政府管理学院</option>
+                        <option value="社会学院">社会学院</option>
+                        <option value="电子信息与光学工程学院">电子信息与光学工程学院</option>
+                        <option value="生命科学学院">生命科学学院</option>
+                        <option value="外国语学院">外国语学院</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>专业</span>
+                    <input id="profile-major" type="text" placeholder="例如：计算机科学与技术">
+                </label>
+
+                <div class="field">
+                    <span>兴趣标签</span>
+                    <div class="tag-selector">
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="通知公告">通知公告</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="培养方案">培养方案</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="课程信息">课程信息</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="教师主页">教师主页</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="科研项目">科研项目</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="招生信息">招生信息</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="夏令营推免">夏令营推免</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="学术讲座">学术讲座</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="活动资讯">活动资讯</button>
+                        <button type="button" class="tag-toggle bubble-target" data-interest-tag="附件文档">附件文档</button>
+                    </div>
+                </div>
+
+                <label class="field">
+                    <span>检索需求补充说明</span>
+                    <textarea id="profile-search-need-text" placeholder="例如：更关注课程安排、最新通知、研究方向与导师主页。"></textarea>
+                </label>
+
+                <div class="auth-actions">
+                    <a href="/" class="ghost-button bubble-target">返回搜索页</a>
+                    <button type="submit" class="solid-button bubble-target">保存画像</button>
+                </div>
+            </form>
+
+            <p id="profile-status" class="status-text"></p>
+        </section>
+    </main>
+
+    <script src="/static/app.js?v=20260616-recommendation-clean-v1"></script>
+</body>
+</html>

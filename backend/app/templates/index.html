@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nankai University Search</title>
+    <link rel="icon" type="image/webp" href="{{ favicon_url | default('/favicon.ico', true) }}">
+    <link rel="stylesheet" href="/static/styles.css?v=20260616-layout-wide-v6">
+</head>
+<body class="app-shell search-page">
+    <div class="ambient-layer" aria-hidden="true">
+        <div class="ambient-glow ambient-glow-a"></div>
+        <div class="ambient-glow ambient-glow-b"></div>
+        <div class="ambient-glow ambient-glow-c"></div>
+    </div>
+
+    <header class="topbar">
+        <a href="/" class="brand bubble-target">
+            <span class="brand-mark">NKU</span>
+            <span class="brand-text">
+                <strong>Nankai University Search</strong>
+                <small>南开大学信息检索平台</small>
+            </span>
+        </a>
+
+        <nav class="topnav" aria-label="主导航">
+            <a href="/" class="nav-link bubble-target">首页</a>
+            <a href="#results-board" class="nav-link bubble-target">学院导航</a>
+            <a href="#results-board" class="nav-link bubble-target">文档检索</a>
+            <a href="#results-board" class="nav-link bubble-target">教师检索</a>
+            <a href="#hot-searches" class="nav-link bubble-target">热门资讯</a>
+            <a href="#results-board" class="nav-link bubble-target">关于平台</a>
+        </nav>
+
+        <div class="top-actions">
+            <a href="/login" class="ghost-button bubble-target">登录</a>
+            <a href="/login" class="solid-button bubble-target">注册</a>
+            <div id="activity-menu" class="activity-menu">
+                <button
+                    id="activity-menu-toggle"
+                    type="button"
+                    class="activity-menu-toggle bubble-target"
+                    aria-label="打开收藏和查询历史"
+                    aria-expanded="false"
+                    aria-controls="activity-menu-panel"
+                >
+                    <span class="activity-menu-icon" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+                <div id="activity-menu-panel" class="activity-menu-panel">
+                    <section class="activity-panel-section">
+                        <div class="activity-panel-head">
+                            <h3>收藏</h3>
+                            <span class="activity-panel-meta">本地保存</span>
+                        </div>
+                        <div id="favorites-panel" class="activity-panel-list"></div>
+                    </section>
+                    <section class="activity-panel-section">
+                        <div class="activity-panel-head">
+                            <h3>查询历史</h3>
+                            <span class="activity-panel-meta">最多 50 条</span>
+                        </div>
+                        <div id="history-panel" class="activity-panel-list"></div>
+                    </section>
+                </div>
+            </div>
+            <span id="user-badge" class="user-pill">未登录</span>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero-card">
+            <div class="hero-copy">
+                <p class="eyebrow">Nankai University Search</p>
+                <h1>
+                    <span class="title-line">南开大学</span>
+                    <span class="title-line title-line-accent">信息检索平台</span>
+                </h1>
+                <p class="lead">
+                    聚合校园网站、通知公告、培养方案、教师主页与附件文档，提供统一检索入口与个性化访问体验。
+                </p>
+                <form id="search-form" class="search-form">
+                    <div id="mode-switch" class="segmented-control mode-switch">
+                        <div class="segment-indicator"></div>
+                        <button type="button" class="segment-button is-active bubble-target" data-mode="normal">综合搜索</button>
+                        <button type="button" class="segment-button bubble-target" data-mode="document">文档搜索</button>
+                        <button type="button" class="segment-button bubble-target" data-mode="phrase">短语查询</button>
+                        <button type="button" class="segment-button bubble-target" data-mode="wildcard">通配查询</button>
+                    </div>
+
+                    <div class="query-tools">
+                        <div id="phrase-slop-control" class="phrase-slop-control is-inactive">
+                            <div class="slop-pill-head">
+                                <span class="filter-label">短语距离</span>
+                                <button
+                                    type="button"
+                                    class="help-tooltip"
+                                    aria-label="slop 参数说明"
+                                    data-tooltip="slop 表示短语词项之间允许的最大位置偏移。0 表示严格短语，要求连续匹配；数值越大越宽松，允许中间插入更多词。"
+                                >?</button>
+                            </div>
+                            <div id="phrase-slop-switch" class="segmented-control slop-switch">
+                                <div class="segment-indicator"></div>
+                                <button type="button" class="segment-button is-active bubble-target" data-phrase-slop="0">0</button>
+                                <button type="button" class="segment-button bubble-target" data-phrase-slop="1">1</button>
+                                <button type="button" class="segment-button bubble-target" data-phrase-slop="2">2</button>
+                                <button type="button" class="segment-button bubble-target" data-phrase-slop="3">3</button>
+                                <button type="button" class="segment-button bubble-target" data-phrase-slop="4">4</button>
+                                <button type="button" class="segment-button bubble-target" data-phrase-slop="5">5</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="search-box">
+                        <div class="search-input-shell" id="query-shell">
+                            <div id="query-overlay" class="query-overlay" aria-hidden="true"></div>
+                            <input
+                                id="query"
+                                type="text"
+                                autocomplete="off"
+                                spellcheck="false"
+                                placeholder="搜索学院、教师、通知、文档、培养方案……"
+                            >
+                            <div id="suggestions-panel" class="suggestions-panel"></div>
+                        </div>
+                        <button id="search-submit" type="submit" class="search-button bubble-target" aria-label="搜索">
+                            <span class="search-icon"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div id="hero-photo-stage" class="hero-photo-stage">
+                    <img
+                        id="hero-photo-primary"
+                        class="hero-photo is-active"
+                        src="{{ (hero_images | default([], true) | first) or '' }}"
+                        alt="南开大学校园照片"
+                        decoding="async"
+                    >
+                    <img id="hero-photo-secondary" class="hero-photo" alt="南开大学校园照片" decoding="async">
+                    <div class="hero-photo-scrim"></div>
+                    <div class="hero-photo-caption">
+                        <span class="hero-photo-kicker">Nankai Campus</span>
+                        <small id="hero-photo-indicator">1 / 1</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="results-board" class="results-board">
+            <div class="results-column">
+                <header id="results-header" class="results-header is-hidden">
+                    <div>
+                        <h2 id="results-summary-title"></h2>
+                    </div>
+                </header>
+
+                <div id="results-loading" class="loading-shell is-hidden">
+                    <div class="loading-bubbles">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <p>搜索结果正在缓慢浮现...</p>
+                </div>
+
+                <div id="results" class="results-list"></div>
+                <footer id="pagination" class="pagination"></footer>
+            </div>
+
+            <aside class="sidebar">
+                <section id="hot-searches" class="side-card">
+                    <div class="side-card-head">
+                        <h3>热门搜索</h3>
+                    </div>
+                    <div class="rank-list">
+                        <button type="button" class="rank-item bubble-target" data-query="人工智能"><span>1</span>人工智能</button>
+                        <button type="button" class="rank-item bubble-target" data-query="数学分析"><span>2</span>数学分析</button>
+                        <button type="button" class="rank-item bubble-target" data-query="公共管理"><span>3</span>公共管理</button>
+                        <button type="button" class="rank-item bubble-target" data-query="考研通知"><span>4</span>考研通知</button>
+                        <button type="button" class="rank-item bubble-target" data-query="图书馆开放时间"><span>5</span>图书馆开放时间</button>
+                    </div>
+                </section>
+
+                <section class="side-card">
+                    <div class="side-card-head">
+                        <h3>为你推荐</h3>
+                        <button id="load-recommendations" type="button" class="ghost-button bubble-target">刷新</button>
+                    </div>
+                    <div id="recommendation-tags" class="recommendation-tags">
+                        <p class="empty-copy">登录后会显示当前用于推荐的画像标签。</p>
+                    </div>
+                    <div id="recommendations" class="recommendations-panel">
+                        <p class="empty-copy">登录后可基于学院、专业、兴趣标签和最近查询生成个性化推荐。</p>
+                    </div>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        window.APP_CONFIG = {
+            searchTimeoutMs: {{ search_request_timeout_ms | default(0, true) | tojson }},
+            heroImages: {{ hero_images | default([], true) | tojson }},
+        };
+    </script>
+    <script src="/static/app.js?v=20260616-recommendation-clean-v1"></script>
+</body>
+</html>
